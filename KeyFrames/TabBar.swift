@@ -9,20 +9,23 @@ import SwiftUI
 
 public struct TabBar: View {
 	public enum Tab: CaseIterable, Hashable, Identifiable {
-		case home
+		case starAnimation
+		case beatingHeart
 		case timeCurves
 
 		var title: String {
 			switch self {
-			case .home: "Home"
+			case .beatingHeart: "Heart"
+			case .starAnimation: "Star"
 			case .timeCurves: "Time Curves"
 			}
 		}
 
 		var image: String {
 			switch self {
-			case .home: "stars-icon"
-			case .timeCurves: "graph-icon"
+			case .beatingHeart: "heart.circle"
+			case .starAnimation: "star.circle"
+			case .timeCurves: "eye.circle"
 			}
 		}
 	}
@@ -30,7 +33,7 @@ public struct TabBar: View {
 	let tabs: [Tab]
 	@State var selected: Tab
 
-	public init(tabs: [Tab] = Tab.allCases, selected: Tab = .home) {
+	public init(tabs: [Tab] = .defaultTabs, selected: Tab = .starAnimation) {
 		self.tabs = tabs
 		self.selected = selected
 	}
@@ -40,11 +43,30 @@ public struct TabBar: View {
 			ForEach(tabs) { tab in
 				SwiftUI.Tab(tab.title, image: tab.image, value: tab) {
 					switch tab {
-						case .home: Home()
-						case .timeCurves: TimeCurves()
+						case .starAnimation: StarAnimationView().tabBarRoot()
+						case .beatingHeart: BeatingHeartView().tabBarRoot()
+						case .timeCurves: TimeCurves().tabBarRoot()
 					}
 				}
 			}
 		}
+	}
+}
+
+extension [TabBar.Tab] {
+	public static let defaultTabs: Self = [.starAnimation, .timeCurves]
+}
+
+private struct TabBarModifier: ViewModifier {
+	func body(content: Content) -> some View {
+		content
+			.toolbarBackground(.ultraThinMaterial, for: .tabBar)
+			.toolbarBackgroundVisibility(.visible, for: .tabBar)
+	}
+}
+
+private extension View {
+	func tabBarRoot() -> some View {
+		modifier(TabBarModifier())
 	}
 }

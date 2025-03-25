@@ -1,2 +1,7 @@
 ## User settings
 xcuserdata/
+
+## Keynote Presentation
+*.key
+
+.DS_Store

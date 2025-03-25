@@ -8,27 +8,7 @@
 import SwiftUI
 
 public struct TimelineCurvePath: View {
-
-	var tracks: [Track] = [.cubic()]
-
-	private func timeline(for totalValue: CGFloat) -> KeyframeTimeline<CGFloat> {
-		let duration: TimeInterval = .animationDuration / Double(tracks.count)
-		return .init(initialValue: 0, content: {
-			for indice in tracks.indices {
-				let track = tracks[indice]
-				let individualValue = (totalValue * CGFloat(indice + 1)) / CGFloat(tracks.count)
-
-				switch track {
-				case let .linear(curve):
-					LinearKeyframe(individualValue, duration: duration, timingCurve: curve)
-				case let .cubic(startVelocity, endVelocity):
-					CubicKeyframe(individualValue, duration: duration, startVelocity: startVelocity, endVelocity: endVelocity)
-				case let .spring(spring, startVelocity):
-					SpringKeyframe(individualValue, duration: duration, spring: spring, startVelocity: startVelocity)
-				}
-			}
-		})
-	}
+	var keyframes: [Keyframe] = []
 
 	public var body: some View {
 		GeometryReader { proxy in
@@ -39,8 +19,8 @@ public struct TimelineCurvePath: View {
 	}
 
 	private func path(width: CGFloat, height: CGFloat) -> Path {
-		let timeline = timeline(for: height)
-		
+		let timeline = keyframes.timeline(for: 1, totalDuration: 2)
+
 		var path = Path()
 		
 		var currentX: CGFloat = .zero
@@ -53,7 +33,7 @@ public struct TimelineCurvePath: View {
 			let value = timeline.value(progress: progress)
 			
 			currentX = width * progress
-			currentY = height - value
+			currentY = height - (height * value)
 			let point = CGPoint(x: currentX, y: currentY)
 
 			path.addLine(to: point)
@@ -69,11 +49,11 @@ private extension TimeInterval {
 
 #Preview {
 	VStack(alignment: .center, spacing: 32) {
-		TimelineCurvePath(tracks: [.linear()])
+		TimelineCurvePath(keyframes: [.linear()])
 
-		TimelineCurvePath(tracks: [.cubic()])
+		TimelineCurvePath(keyframes: [.cubic()])
 
-		TimelineCurvePath(tracks: [.spring(), .spring()])
+		TimelineCurvePath(keyframes: [.spring(), .spring()])
 	}
 	.padding(.horizontal, 32)
 	.padding(.vertical, 64)
