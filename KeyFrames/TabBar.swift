@@ -54,7 +54,8 @@ public struct TabBar: View {
 }
 
 extension [TabBar.Tab] {
-	public static let defaultTabs: Self = [.starAnimation, .timeCurves]
+//	public static let defaultTabs: Self = [.starAnimation, .timeCurves]
+	public static let defaultTabs: Self = TabBar.Tab.allCases
 }
 
 private struct TabBarModifier: ViewModifier {
