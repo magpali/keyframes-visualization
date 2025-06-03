@@ -23,6 +23,9 @@ public struct TimeCurves: View {
 
 	@FocusState private var isTextFieldFocused: Bool
 
+	private var toneGenerator: ToneGenerator = .init()
+	@State private var animationTask = Task<Void, Never> { }
+
 	public var body: some View {
 		ZStack {
 			background
@@ -48,6 +51,8 @@ public struct TimeCurves: View {
 		}
 		.padding(.spacingM)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.onAppear { toneGenerator.startEngine() }
+		.onDisappear { toneGenerator.stopEngine() }
 	}
 
 	private var animatableContent: some View  {
@@ -215,6 +220,8 @@ public struct TimeCurves: View {
 		endEditing()
 		animationTrigger = false
 		keyframes = []
+		toneGenerator.pause()
+		animationTask.cancel()
 	}
 
 	private func endEditing() {
@@ -224,13 +231,30 @@ public struct TimeCurves: View {
 	}
 
 	private func animate() {
-		Task {
+		animationTask.cancel()
+		animationTask = Task {
 			if animationTrigger {
 				animationTrigger = false
 				try? await Task.sleep(for: .milliseconds(250))
 			}
 
 			animationTrigger = true
+
+			toneGenerator.play()
+
+			let timeline = keyframes.timeline(for: 1, totalDuration: 1.75)
+			var currentTime: Double = 0
+			while Task.isCancelled == false {
+				let value = timeline.value(time: currentTime)
+
+				toneGenerator.set(pitch: Float(value))
+				try? await Task.sleep(for: .milliseconds(10))
+				if currentTime < 1.75 {
+					currentTime += 0.01
+				} else {
+					currentTime = 0
+				}
+			}
 		}
 	}
 }

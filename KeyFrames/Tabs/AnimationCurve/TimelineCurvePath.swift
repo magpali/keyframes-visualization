@@ -46,7 +46,6 @@ private extension TimeInterval {
 	static let animationDuration: Self = 1
 }
 
-
 #Preview {
 	VStack(alignment: .center, spacing: 32) {
 		TimelineCurvePath(keyframes: [.linear()])
