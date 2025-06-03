@@ -127,10 +127,14 @@ public struct StarAnimationView: View {
 	@KeyframesBuilder<StarAnimationValues>
 	func starKeyframes(for point: CGPoint, in rect: CGRect, offsetMultipler: CGFloat) -> some Keyframes<StarAnimationValues> {
 		KeyframeTrack(\.pathTravelPercentage) {
+			MoveKeyframe(0)
+
 			LinearKeyframe(1, duration: 1, timingCurve: .linear)
 		}
 
 		KeyframeTrack(\.xOffset) {
+			MoveKeyframe(0)
+
 			LinearKeyframe(
 				offset(for: point, in: rect, multiplier: offsetMultipler),
 				duration: 0.8,
@@ -145,6 +149,8 @@ public struct StarAnimationView: View {
 		}
 
 		KeyframeTrack(\.rotation) {
+			MoveKeyframe(Angle(degrees: 0))
+
 			LinearKeyframe(
 				Angle(degrees: .fullRotation * 3 * rotationDirecton(for: point, in: rect)),
 				duration: 1,
@@ -163,6 +169,8 @@ public struct StarAnimationView: View {
 		}
 
 		KeyframeTrack(\.scale) {
+			MoveKeyframe(1)
+
 			SpringKeyframe(2, duration: 0.5, spring: .snappy)
 
 			SpringKeyframe(0.5, duration: 0.5, spring: .snappy)
